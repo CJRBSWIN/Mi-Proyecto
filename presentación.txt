@@ -1,0 +1,55 @@
+1. Introducción (30 segundos)
+“Este programa usa vectores para representar películas.
+
+Cada película se convierte en un vector de 0s y 1s según los géneros que tiene.
+
+Con esos vectores calculamos qué tan parecidas son dos películas y también podemos buscar por palabras clave.”
+
+2. Los datos
+“Tenemos dos estructuras principales:
+GENEROS: la lista de los 10 géneros posibles (son las columnas).
+PELICULAS: un diccionario con 13 películas. Cada una tiene sus géneros y sus palabras clave.”
+
+
+3. Crear el vector de una película
+“La función crear_vector_generos recorre los 10 géneros y pone:
+1 si la película tiene ese género
+0 si no lo tiene
+Ejemplo: Matrix tiene Acción, Ciencia Ficción y Thriller →
+
+[1, 0, 0, 0, 1, 0, 0, 0, 1, 0]”
+
+4. La matriz
+“Si juntamos el vector de todas las películas, obtenemos una matriz:
+
+13 filas (películas) × 10 columnas (géneros).
+
+Eso es lo que muestra la opción 2 del menú.”
+
+5. El álgebra (la parte más importante)
+“Para medir la similitud usamos la similitud coseno:
+Producto punto: multiplicamos posición a posición y sumamos.
+Magnitud: la longitud del vector (raíz de la suma de los cuadrados).
+Fórmula: producto punto dividido entre el producto de las magnitudes.
+El resultado va de 0 (nada en común) a 1 (idénticas).”
+
+6. Búsqueda por palabras clave
+“Funciona igual que el ejemplo del spam.
+
+Contamos cuántas palabras clave de la película coinciden con lo que escribe el usuario.
+
+Si hay al menos una coincidencia, mostramos esa película.”
+
+7. El menú
+“El programa principal es un while True con un if/elif/else.
+
+Cada número del menú llama a una función distinta.
+
+Solo se sale del bucle cuando el usuario elige la opción 5.”
+
+8. Cierre (15 segundos)
+“En resumen:
+Convertimos películas en vectores
+Calculamos similitud con álgebra
+Buscamos por palabras clave
+Y todo se controla desde un menú con funciones.”

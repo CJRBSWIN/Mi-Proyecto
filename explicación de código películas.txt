@@ -1,0 +1,104 @@
+1. La cabecera y los datos
+python
+import math
+
+Solo necesitamos math para math.sqrt() (raíz cuadrada), que usaremos en la fórmula de la similitud.
+
+python
+GENEROS = ["Accion", "Comedia", ...]  # 10 géneros
+PELICULAS = {
+    "Matrix": {"generos": [...], "palabras_clave": [...]},
+    ...
+}
+
+GENEROS es la lista fija de las 10 categorías posibles — son las columnas de nuestra futura matriz. PELICULAS es un diccionario de diccionarios: cada película tiene su lista de géneros y su lista de palabras clave. Todo el resto del programa trabaja sobre estos dos datos.
+
+2. Convertir una película en un vector
+python
+def crear_vector_generos(pelicula):
+    generos_pelicula = PELICULAS[pelicula]["generos"]
+    return [1 if genero in generos_pelicula else 0 for genero in GENEROS]
+
+Esto recorre los 10 géneros en orden y, por cada uno, pregunta "¿esta película lo tiene?" → 1 si sí, 0 si no. El resultado es un vector binario de longitud 10.
+
+Ejemplo concreto para explicar en clase: Matrix tiene ["Accion", "Ciencia Ficcion", "Thriller"]. Como esos géneros están en las posiciones 0, 4 y 8 de GENEROS, el vector queda:
+
+[1, 0, 0, 0, 1, 0, 0, 0, 1, 0]
+3. De vectores a matriz
+python
+def crear_matriz_generos():
+    return {pelicula: crear_vector_generos(pelicula) for pelicula in PELICULAS}
+
+Simplemente llama a la función anterior para cada película y junta todos los vectores. Si dibujas cada vector como una fila, tienes una tabla de 13 filas × 10 columnas — eso es la matriz. Es el mismo concepto que ves en la opción 2 del menú.
+
+4. El álgebra: producto punto, magnitud y similitud coseno
+
+Esta es la parte central para tu exposición — la fórmula que estáis viendo en clase.
+
+python
+def producto_punto(v1, v2):
+    return sum(a * b for a, b in zip(v1, v2))
+
+zip(v1, v2) empareja las posiciones de los dos vectores: (v1[0], v2[0]), (v1[1], v2[1]), etc. Por cada pareja multiplicamos, y sum() suma todos esos productos. Es literalmente la definición de producto punto: v1·v2 = Σ(v1ᵢ × v2ᵢ).
+
+python
+def magnitud(v):
+    return math.sqrt(sum(a ** 2 for a in v))
+
+Eleva cada componente al cuadrado, los suma, y saca la raíz — la fórmula de la longitud de un vector: |v| = √(Σvᵢ²).
+
+python
+def similitud_coseno(v1, v2):
+    denominador = magnitud(v1) * magnitud(v2)
+    if denominador == 0:
+        return 0
+    return producto_punto(v1, v2) / denominador
+
+Junta las dos anteriores en la fórmula completa: similitud = (v1·v2) / (|v1| × |v2|). El resultado va de 0 (nada en común) a 1 (idénticos). El if denominador == 0 evita un error de división por cero, por si alguna película no tuviera ningún género asignado.
+
+Ejemplo para trazar en la pizarra: Matrix [1,0,0,0,1,0,0,0,1,0] vs. Inception [1,0,0,0,1,0,0,0,1,0] (mismos géneros) → producto punto = 3, magnitud de cada uno = √3, similitud = 3/(√3×√3) = 3/3 = 1.0 → 100%.
+
+5. Las funciones del menú
+python
+def pedir_pelicula(mensaje):
+    while True:
+        entrada = input(mensaje).strip()
+        for nombre in PELICULAS:
+            if nombre.lower() == entrada.lower():
+                return nombre
+        print("   Esa película no está en el catálogo...")
+
+Un bucle que no deja avanzar hasta que el usuario escriba un nombre que exista (comparando en minúsculas, para que "matrix" y "Matrix" cuenten igual).
+
+Las cuatro funciones de opción son variaciones del mismo patrón — usan lo de arriba y lo muestran con print():
+
+listar_peliculas() — recorre PELICULAS.items() y muestra nombre + géneros.
+mostrar_matriz() — llama a crear_matriz_generos() y la imprime fila por fila.
+comparar_peliculas() — pide dos películas con pedir_pelicula(), construye sus vectores, calcula la similitud, y añade una frase interpretando el porcentaje.
+buscar_por_palabra_clave() — pide una palabra, y por cada película cuenta cuántas de sus palabras_clave la contienen (palabra in clave.lower()). Si la lista de coincidencias no está vacía, las muestra.
+6. El programa principal
+python
+def main():
+    while True:
+        print(...menú...)
+        opcion = input("Elige una opción: ").strip()
+
+        if opcion == "1":
+            listar_peliculas()
+        elif opcion == "2":
+            ...
+        elif opcion == "5":
+            print("👋 ¡Hasta luego!")
+            break
+        else:
+            print("⚠️  Opción no válida.")
+
+El while True mantiene el menú apareciendo una y otra vez. El if/elif/else decide, según el número escrito, qué función llamar — ese es el corazón del ejercicio: cada opción del menú ejecuta una función distinta. break es lo único que puede sacarte del bucle, y solo ocurre al elegir "5".
+
+python
+if __name__ == "__main__":
+    main()
+
+Esto es una convención de Python: significa "si este archivo se ejecuta directamente (no si lo importa otro archivo), arranca main()". Es una buena práctica que probablemente te pregunten en clase — puedes explicarlo como "el punto de entrada del programa".
+
+Guion rápido para exponer: datos → vector de una película → matriz de todas → las 3 funciones matemáticas (con el ejemplo de Matrix/Inception en la pizarra) → cómo el menú conecta todo con if/elif/else dentro de un while.
